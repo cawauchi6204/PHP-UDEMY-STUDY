@@ -1,9 +1,11 @@
 <?php
 
-require './db_connetction.php';
+require_once './db_connetction.php';
 
+function h($str) {
+  return htmlspecialchars($str,ENT_NOQUOTES);
+}
 
-$name = $_POST['your_name'];
 $email = $_POST['email'];
 $url = $_POST['url'];
 $gender = $_POST['gender'];
@@ -12,7 +14,27 @@ $contents = $_POST['contents'];
 $check = $_POST['check'];
 $submited = $_POST['submited'];
 
+$errorMessage = "";
+$signUpMessage = "";
 
+if (isset($_POST["signUp"])) {
+  //ユーザー idのチェック
+  if (empty($_POST['your_name'])) {
+    $errorMessage = 'ユーザーIDが未入力です';
+  } else if (empty($_POST['password'])) {
+    $errorMessage = 'パスワードが未入力です';
+  } else if (empty($_POST['password2'])) {
+    $errorMessage = 'パスワードが未入力です';
+  }
+
+  if ( !empty($_POST['your_name']) && !empty($_POST['password'])  && !empty($_POST['password2']) && $_POST['password'] === $_POST['password2'] ){
+    // 入力したユーザIDとパスワードを格納
+    $name = $_POST['your_name'];
+    $password = $_POST['password'];
+  }else if ($_POST['password'] != $_POST['password2']) {
+    $errorMessage = 'パスワードに誤りがあります';
+  }
+}
 
 ?>
 
@@ -30,6 +52,12 @@ $submited = $_POST['submited'];
   </label><br><br>
   <label for="email">メールアドレス<br>
     <input type="email" name="email">
+  </label><br><br>
+  <label for="password">パスワード<br>
+    <input type="password" name="password" id="password">
+  </label><br><br>
+  <label for="password2">パスワード再入力<br>
+    <input type="password" name="password2" id="password2">
   </label><br><br>
   <label for="url">ホームページ<br>
     <input type="text" name="url">
