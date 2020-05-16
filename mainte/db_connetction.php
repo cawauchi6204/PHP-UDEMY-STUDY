@@ -5,7 +5,6 @@ const DB_USER = 'php_user';
 const DB_PASSWORD = 'password123';
 
 
-
 try {
   $pdo = new PDO(DB_HOST,DB_USER,DB_PASSWORD,[
     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
