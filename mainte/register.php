@@ -51,7 +51,7 @@ print_r($error);
     <title>Document</title>
   </head>
   <body>
-    <form action="./register.php" method="post">
+    <form action="" method="post">
       <label for="name"
         >お名前<br />
         <?php if($error['your_name'] === 'blank'):  ?>

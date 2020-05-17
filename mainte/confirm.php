@@ -1,4 +1,8 @@
 <?php
+// if(!isset($_SESSION['join'])) {
+//   header('Location:register.php');
+//   exit();
+// }
 session_start();
 
 require './db_connetction.php';
@@ -8,22 +12,32 @@ function h($str) {
   return htmlspecialchars($str,ENT_QUOTES);
 }
 
+$name = $_SESSION['join']['your_name'];
+$email=$_SESSION['join']['email'];
+$password=$_SESSION['join']['password'];
+$gender=$_SESSION['join']['gender'];
+$age=$_SESSION['join']['age'];
+
 // データベースに入力ができない
 if(!empty($_POST)) {
-  $stmt = $pdo->prepare('INSERT INTO users SET name = ? , email = ? , password = ? , gender = ? , age = ?');
-  $stmt =bindValue(1 , $_SESSION['join']['your_name']);
-  $stmt =bindValue(2 , $_SESSION['join']['email']);
-  $stmt =bindValue(3 , sha1($_SESSION['join']['password']));
-  $stmt =bindValue(4 , $_SESSION['join']['gender']);
-  $stmt =bindValue(5 , $_SESSION['join']['age']);
-  $stmt = execute();
+  $stmt = $pdo->prepare("INSERT INTO users SET name = :name , email = :email , password = :password , gender = :gender , age = :age");
+  // メソッドだったのに$stmt=bindParamとしていたので直した
+  // だがいまだデータベースに入力できず
+  // try文の中にpreparedstatmentを書いたらDBに直接登録できたのでおそらくbindParamあたりが作動していない
+  $stmt->bindParam(1 , $name);
+  $stmt->bindParam(2 ,  $email);
+  $stmt->bindParam(3 , $password);
+  $stmt->bindParam(4 , $gender);
+  $stmt->bindParam(5 , $age);
+  $stmt->execute();
 }
 
-var_dump($_SESSION['join']);
-if(!isset($_SESSION['join'])) {
-  header('Location:register.php');
-  exit();
-}
+var_dump($_SESSION['join']['your_name']);
+var_dump($_SESSION['join']['email']);
+var_dump($_SESSION['join']['password']);
+var_dump($_SESSION['join']['gender']);
+var_dump($_SESSION['join']['age']);
+
 
 ?>
 
