@@ -3,6 +3,8 @@
 // ここでセッションに記録しないとページが遷移した時にPOSTの情報が保持されない
 session_start();
 
+require './db_connection.php';
+
 if (!empty($_POST)) {
 
 // フォームのバリデーション
@@ -31,9 +33,20 @@ if (!empty($_POST)) {
       $error['check'] = 'empty';
   }
 
+  // メールアドレスの重複チェック
+  $email = $_POST['email'];
+  $member = $pdo->prepare("SELECT * FROM users  WHERE email=:email ");
+  $member->bindValue(':email' , $email);
+  $member->execute();
+  $result = $member->fetch();
+  if($result > 0) {
+    $error['email'] = 'duplicate';
+  }
+
+
   if (empty($error)) {
       // $_POSTの情報を$_SESSION['join']の中に格納している
-      // 次のページで使うには$_SESSION['join']['hogeehoge']で利用できる
+      // 次のページで使うには$_SESSION['join']['hogehoge']で利用できる
       $_SESSION['join'] = $_POST;
       header('Location:confirm.php');
       exit();
@@ -61,6 +74,9 @@ print_r($error);
       ><br /><br />
       <label for="email"
         >メールアドレス<br />
+        <?php if($error['email'] === 'duplicate'): ?>
+        <p>このメールアドレスはすでに登録されています</p>
+        <?php endif; ?>
         <?php if($error['email'] === 'blank'):  ?>
         <p>空白です</p>
         <?php endif; ?>

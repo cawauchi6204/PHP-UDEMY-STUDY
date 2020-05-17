@@ -1,35 +1,44 @@
 <?php
-// if(!isset($_SESSION['join'])) {
-//   header('Location:register.php');
-//   exit();
-// }
+
 session_start();
 
-require './db_connetction.php';
+require './db_connection.php';
+
+if(!isset($_SESSION['join'])) {
+  header('Location:register.php');
+  exit();
+}
 
 // htmlspecialcharsで入力でのXSS防止
 function h($str) {
   return htmlspecialchars($str,ENT_QUOTES);
 }
 
-$name = $_SESSION['join']['your_name'];
-$email=$_SESSION['join']['email'];
-$password=$_SESSION['join']['password'];
-$gender=$_SESSION['join']['gender'];
-$age=$_SESSION['join']['age'];
 
 // データベースに入力ができない
 if(!empty($_POST)) {
   $stmt = $pdo->prepare("INSERT INTO users SET name = :name , email = :email , password = :password , gender = :gender , age = :age");
+
+  $name = $_SESSION['join']['your_name'];
+  $email=$_SESSION['join']['email'];
+  // sha1でパスワードの暗号化
+  $password=sha1($_SESSION['join']['password']);
+  $gender=$_SESSION['join']['gender'];
+  $age=$_SESSION['join']['age'];
   // メソッドだったのに$stmt=bindParamとしていたので直した
   // だがいまだデータベースに入力できず
   // try文の中にpreparedstatmentを書いたらDBに直接登録できたのでおそらくbindParamあたりが作動していない
-  $stmt->bindParam(1 , $name);
-  $stmt->bindParam(2 ,  $email);
-  $stmt->bindParam(3 , $password);
-  $stmt->bindParam(4 , $gender);
-  $stmt->bindParam(5 , $age);
+  $stmt->bindValue(':name' , $name);
+  $stmt->bindValue(':email' , $email);
+  $stmt->bindValue(':password' , $password);
+  $stmt->bindValue(':gender' , $gender);
+  $stmt->bindValue(':age' , $age);
   $stmt->execute();
+
+  unset($_SESSION['join']);
+
+  header('Location:thanks.php');
+  exit();
 }
 
 var_dump($_SESSION['join']['your_name']);
@@ -49,7 +58,7 @@ var_dump($_SESSION['join']['age']);
 <title>Document</title>
 </head>
 <body>
-<form action="./thanks.php" method="post">
+<form action="" method="post">
   <label for="name">お名前:<?php echo h($_SESSION['join']['your_name']) ?><br>
   </label><br><br>
   <label for="email">メールアドレス:<?php echo h($_SESSION['join']['email']) ?><br>
@@ -63,7 +72,9 @@ var_dump($_SESSION['join']['age']);
   <label for="age">年齢<?php echo h($_SESSION['join']['age']) ?><br>
   </label><br><br>
   <p>この情報でお間違い無いですか？</p>
-  <input type="submit" value="間違い無いので送信する" name="submited">
+  <!-- このhiddenを付け足してからDB連携することができた -->
+  <input type="hidden" name="action" value="submit">
+  <input type="submit" value="登録する">
 </form>
 </body>
 </html>
