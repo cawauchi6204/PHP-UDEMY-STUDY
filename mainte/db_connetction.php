@@ -12,7 +12,7 @@ try {
     PDO::ATTR_EMULATE_PREPARES => false,
   ]);
   echo '接続成功';
-  
+
 } catch(PDOException $e){
   echo '接続失敗' . $e->getMessage() . "\n";
   exit();
