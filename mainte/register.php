@@ -1,5 +1,8 @@
 <?php
 
+// ここでセッションに記録しないとページが遷移した時にPOSTの情報が保持されない
+session_start();
+
 if (!empty($_POST)) {
 
 // フォームのバリデーション
@@ -29,6 +32,9 @@ if (!empty($_POST)) {
   }
 
   if (empty($error)) {
+      // $_POSTの情報を$_SESSION['join']の中に格納している
+      // 次のページで使うには$_SESSION['join']['hogeehoge']で利用できる
+      $_SESSION['join'] = $_POST;
       header('Location:confirm.php');
       exit();
   }
@@ -44,7 +50,7 @@ print_r($error);
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
   </head>
-  <body style="text-align: center; width: 300px;">
+  <body>
     <form action="./register.php" method="post">
       <label for="name"
         >お名前<br />

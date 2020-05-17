@@ -1,9 +1,28 @@
 <?php
+session_start();
 
-require_once './db_connetction.php';
+require './db_connetction.php';
 
+// htmlspecialcharsで入力でのXSS防止
 function h($str) {
-  return htmlspecialchars($str,ENT_NOQUOTES);
+  return htmlspecialchars($str,ENT_QUOTES);
+}
+
+// データベースに入力ができない
+if(!empty($_POST)) {
+  $stmt = $pdo->prepare('INSERT INTO users SET name = ? , email = ? , password = ? , gender = ? , age = ?');
+  $stmt =bindValue(1 , $_SESSION['join']['your_name']);
+  $stmt =bindValue(2 , $_SESSION['join']['email']);
+  $stmt =bindValue(3 , sha1($_SESSION['join']['password']));
+  $stmt =bindValue(4 , $_SESSION['join']['gender']);
+  $stmt =bindValue(5 , $_SESSION['join']['age']);
+  $stmt = execute();
+}
+
+var_dump($_SESSION['join']);
+if(!isset($_SESSION['join'])) {
+  header('Location:register.php');
+  exit();
 }
 
 ?>
@@ -15,27 +34,22 @@ function h($str) {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Document</title>
 </head>
-<body style="text-align:center;width:300px;">
-<form action="./confirm.php" method="post">
-  <label for="name">お名前:<br>
-
+<body>
+<form action="./thanks.php" method="post">
+  <label for="name">お名前:<?php echo h($_SESSION['join']['your_name']) ?><br>
   </label><br><br>
-  <label for="email">メールアドレス<br>
+  <label for="email">メールアドレス:<?php echo h($_SESSION['join']['email']) ?><br>
   </label><br><br>
-  <label for="password">パスワード<br>
+  <label for="password">パスワード:表示されません<br>
   </label><br><br>
-  <label for="password2">パスワード再入力<br>
+  <label for="url">ホームページ:<?php echo h($_SESSION['join']['url']) ?>
   </label><br><br>
-  <label for="url">ホームページ<br>
+  <label for="gender">性別:<?php echo h($_SESSION['join']['gender']) ?><br>
   </label><br><br>
-  <label for="gender">性別<br>
+  <label for="age">年齢<?php echo h($_SESSION['join']['age']) ?><br>
   </label><br><br>
-  <label for="age">年齢<br>
-  </label><br><br>
-  <label for="contents">お問い合わせ内容<br><br>
-    <textarea name="contents" id="contents" cols="30" rows="10"></textarea>
-  </label><br><br>
-  <input type="submit" value="送信する" name="submited">
+  <p>この情報でお間違い無いですか？</p>
+  <input type="submit" value="間違い無いので送信する" name="submited">
 </form>
 </body>
 </html>
