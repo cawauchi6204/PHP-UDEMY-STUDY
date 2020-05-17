@@ -19,7 +19,6 @@ function h($str) {
 if(!empty($_POST)) {
   $stmt = $pdo->prepare("INSERT INTO users SET name = :name , email = :email , password = :password , gender = :gender , age = :age");
 
-
   $name = $_SESSION['join']['your_name'];
   $email=$_SESSION['join']['email'];
   // sha1でパスワードの暗号化
@@ -38,7 +37,7 @@ if(!empty($_POST)) {
 
   unset($_SESSION['join']);
 
-  header('Location:register.php');
+  header('Location:thanks.php');
   exit();
 }
 
