@@ -1,34 +1,39 @@
 <?php
-
+ini_set( 'display_errors', 1 );
+ini_set( 'error_reporting', E_ALL );
 //ログインができない
 session_start();
 
 require './db_connection.php';
 
-
 if(isset($_SESSION['id'])) {
-  header('Location:../../main.php');
+  header('Location:main.php');
   exit();
 }
 
+
 if (isset($_POST['email']) && isset($_POST['password'])) {
-  $stmt = $pdo->prepare('SELECT * FROM users WHERE email = :email , password = :password');
-  $stmt->bindValue(':email', $_POST['email']);
-  $stmt->bindValue(':password', sha1($_POST['password']));
+  $stmt = $pdo->prepare('SELECT * FROM users WHERE email = :email AND password = :password');
+  $email=$_POST['email'];
+  // sha1でパスワードの暗号化
+  $password=sha1($_POST['password']);
+  $stmt->bindValue(':email', $email);
+  $stmt->bindValue(':password', $password);
   // クエリの実行
   $stmt->execute();
   $row = $stmt->fetch();
-
+  var_dump($row);
+  
   // fetchで値をとってきてあればmain.phpなければregister.phpへ遷移させる
   if ($row) {
     var_dump($row);
     $_SESSION['id'] = $row['id'];
-    header('Location:../../main.php');
+    header('Location:main.php');
     exit();
   } else {
-    header('Location:../../register.php');
-    exit();
+    $error['login'] = 'failed';
   }
+
 }
 
 
