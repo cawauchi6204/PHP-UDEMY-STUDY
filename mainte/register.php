@@ -47,9 +47,9 @@ if (!empty($_POST)) {
   if (empty($error)) {
       // $_POSTの情報を$_SESSION['join']の中に格納している
       // 次のページで使うには$_SESSION['join']['hogehoge']で利用できる
-      $_SESSION['join'] = $_POST;
-      header('Location:confirm.php');
-      exit();
+    $_SESSION['join'] = $_POST;
+    header('Location:confirm.php');
+    exit();
   }
 }
 
