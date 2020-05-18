@@ -6,6 +6,6 @@
   <title>Document</title>
 </head>
 <body>
-  <a href="">ログインする</a>
+  <a href="login.php">ログインする</a>
 </body>
 </html>

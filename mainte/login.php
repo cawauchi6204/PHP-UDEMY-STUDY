@@ -1,55 +1,60 @@
 <?php
 
-require './db_connetction.php';
-
+//ログインができない
 session_start();
 
+require './db_connection.php';
 
-$name = $_POST['your_name'];
-$email = $_POST['email'];
-$url = $_POST['url'];
-$gender = $_POST['gender'];
-$age = $_POST['age'];
-$contents = $_POST['contents'];
-$check = $_POST['check'];
-$submited = $_POST['submited'];
 
+if(isset($_SESSION['id'])) {
+  header('Location:../../main.php');
+  exit();
+}
+
+if (isset($_POST['email']) && isset($_POST['password'])) {
+  $stmt = $pdo->prepare('SELECT * FROM users WHERE email = :email , password = :password');
+  $stmt->bindValue(':email', $_POST['email']);
+  $stmt->bindValue(':password', sha1($_POST['password']));
+  // クエリの実行
+  $stmt->execute();
+  $row = $stmt->fetch();
+
+  // fetchで値をとってきてあればmain.phpなければregister.phpへ遷移させる
+  if ($row) {
+    var_dump($row);
+    $_SESSION['id'] = $row['id'];
+    header('Location:../../main.php');
+    exit();
+  } else {
+    header('Location:../../register.php');
+    exit();
+  }
+}
 
 
 ?>
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ログイン画面</title>
 </head>
-<body style="text-align:center;width:300px;">
-<form action="./confirm.php" method="post">
-  <label for="name">お名前<br>
-    <input type="text" name="your_name" id="name">
-  </label><br><br>
-  <label for="email">メールアドレス<br>
-    <input type="email" name="email">
-  </label><br><br>
-  <label for="url">ホームページ<br>
-    <input type="text" name="url">
-  </label><br><br>
-  <label for="gender">性別<br>
-    <input type="radio" name="gender" value="0" id="gender">男性
-    <input type="radio" name="gender" value="1" id="gender">女性
-  </label><br><br>
-  <label for="age">年齢<br>
-    <input type="number" name="age" id="age" placeholder="選択してください">
-  </label><br><br>
-  <label for="contents">お問い合わせ内容<br><br>
-    <textarea name="contents" id="contents" cols="30" rows="10"></textarea>
-  </label><br><br>
-  <label for="check">
-    <input type="checkbox" name="check">
-  </label>注意事項に同意する<br><br>
-  <input type="submit" value="送信する" name="submited">
-</form>
+<body>
+  <h1>ログインする</h1>
+  <p>メールアドレスとパスワードを記入してログインしてください。<br>入会手続きがまだの方はこちらからどうぞ</p>
+  <a href="./register.php">入会手続きをする</a>
+  <form action="" method="post">
+    <label for="">メールアドレス
+      <input type="email" name="email" id="">
+    </label>
+    <br><br>
+    <label for="">パスワード
+      <input type="password" name="password" id="">
+    </label>
+    <br><br>
+    <input type="hidden" name="action">
+    <input type="submit" name="login" value="サインインする">
+  </form>
 </body>
 </html>
